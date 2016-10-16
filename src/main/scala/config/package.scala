@@ -3,7 +3,7 @@ import com.typesafe.config.ConfigFactory
 package object config {
 
   private lazy val config = {
-    ConfigFactory.load("abc-service")
+    ConfigFactory.load().getConfig("abc-service")
   }
 
   val serviceInfo =

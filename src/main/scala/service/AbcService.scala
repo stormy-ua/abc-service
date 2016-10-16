@@ -1,30 +1,46 @@
 package service
 
 import model.AbcDoc
-import repositories.AbcRepository
+import repositories.AppAbcRepository
 import spray.http.MediaTypes._
 import spray.routing._
 import spray.httpx.SprayJsonSupport._
 import spray.json.DefaultJsonProtocol._
 import spray.httpx.marshalling.MetaMarshallers._
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{Promise, Future, ExecutionContext}
 import ExecutionContext.Implicits.global
+import scalaz.std.scalaFuture._
 
-trait AbcService extends HttpService with AbcRepository {
+trait AbcService extends HttpService {
 
   import json._
+  import container._
+  import config._
+
+  implicit val containerInstance = Container(
+    abcRepo = new AppAbcRepository(mongoInfo))
 
   val routes =
     respondWithMediaType(`application/javascript`) {
       get {
         path("documents") {
             complete {
-              all
+              exec {
+                for {
+                  c <- abcRepository
+                  r <- c.all
+                } yield r
+              }
             }
         }~
         path("documents" / IntNumber) { id => {
             complete {
-              getById(id)
+              exec {
+                for {
+                  c <- abcRepository
+                  r <- c.getById(id)
+                } yield r
+              }
             }
           }
         }
@@ -33,7 +49,12 @@ trait AbcService extends HttpService with AbcRepository {
         path("documents") {
           entity(as[AbcDoc]) { d =>
             complete {
-              insert(d)
+              exec {
+                for {
+                  c <- abcRepository
+                  r <- c.insert(d)
+                } yield r
+              }
             }
           }
         }
@@ -41,7 +62,12 @@ trait AbcService extends HttpService with AbcRepository {
       delete {
         path("documents" / IntNumber) { id => {
           complete {
-            deleteById(id)
+            exec {
+              for {
+                c <- abcRepository
+                r <- c.deleteById(id)
+              } yield r
+            }
           }
         }
         }
