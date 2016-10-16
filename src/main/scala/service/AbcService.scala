@@ -1,5 +1,6 @@
 package service
 
+import journal.Logger
 import model.AbcDoc
 import repositories.AppAbcRepository
 import spray.http.MediaTypes._
@@ -16,7 +17,9 @@ trait AbcService extends HttpService {
   import json._
   import container._
   import config._
+  import logging._
 
+  implicit val log = Logger[this.type]
   implicit val containerInstance = Container(
     abcRepo = new AppAbcRepository(mongoInfo))
 
@@ -26,6 +29,7 @@ trait AbcService extends HttpService {
         path("documents") {
             exec {
               for {
+                _ <- info("documents list requested")
                 c <- abcRepository
                 r <- c.all
               } yield r
@@ -34,6 +38,7 @@ trait AbcService extends HttpService {
         path("documents" / IntNumber) { id => {
             exec {
               for {
+                _ <- info(s"document with id=$id requested")
                 c <- abcRepository
                 r <- c.getById(id)
               } yield r
@@ -46,6 +51,7 @@ trait AbcService extends HttpService {
           entity(as[AbcDoc]) { d =>
             exec {
               for {
+                _ <- info(s"create new document request: $d")
                 c <- abcRepository
                 r <- c.insert(d)
               } yield r
@@ -57,6 +63,7 @@ trait AbcService extends HttpService {
         path("documents" / IntNumber) { id => {
             exec {
               for {
+                _ <- info(s"request to delete the document with id=$id received")
                 c <- abcRepository
                 r <- c.deleteById(id)
               } yield r
