@@ -24,23 +24,19 @@ trait AbcService extends HttpService {
     respondWithMediaType(`application/javascript`) {
       get {
         path("documents") {
-            complete {
-              exec {
-                for {
-                  c <- abcRepository
-                  r <- c.all
-                } yield r
-              }
+            exec {
+              for {
+                c <- abcRepository
+                r <- c.all
+              } yield r
             }
         }~
         path("documents" / IntNumber) { id => {
-            complete {
-              exec {
-                for {
-                  c <- abcRepository
-                  r <- c.getById(id)
-                } yield r
-              }
+            exec {
+              for {
+                c <- abcRepository
+                r <- c.getById(id)
+              } yield r
             }
           }
         }
@@ -48,20 +44,17 @@ trait AbcService extends HttpService {
       post {
         path("documents") {
           entity(as[AbcDoc]) { d =>
-            complete {
-              exec {
-                for {
-                  c <- abcRepository
-                  r <- c.insert(d)
-                } yield r
-              }
+            exec {
+              for {
+                c <- abcRepository
+                r <- c.insert(d)
+              } yield r
             }
           }
         }
       }~
       delete {
         path("documents" / IntNumber) { id => {
-          complete {
             exec {
               for {
                 c <- abcRepository
@@ -69,7 +62,6 @@ trait AbcService extends HttpService {
               } yield r
             }
           }
-        }
         }
       }
     }

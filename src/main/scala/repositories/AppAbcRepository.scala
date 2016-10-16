@@ -2,11 +2,11 @@ package repositories
 
 import config.MongoInfo
 import model.AbcDoc
-import org.mongodb.scala.MongoClient
-import org.mongodb.scala.bson.collection.immutable.Document
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class AppAbcRepository(mongoInfo: MongoInfo) extends AbcRepository {
+  import org.mongodb.scala.MongoClient
+  import org.mongodb.scala.bson.collection.immutable.Document
   import org.mongodb.scala.model.Filters._
 
   def toAbcDoc(d: Document): AbcDoc =

@@ -5,8 +5,14 @@ import scalaz.std.scalaFuture._
 import scalaz.Kleisli
 import scala.concurrent.{Future, ExecutionContext}
 import ExecutionContext.Implicits.global
+import spray.http.MediaTypes._
+import spray.routing._
+import spray.httpx.SprayJsonSupport._
+import spray.json.DefaultJsonProtocol._
+import spray.httpx.marshalling.MetaMarshallers._
+import spray.httpx.marshalling.{ToResponseMarshaller, ToResponseMarshallable}
 
-package object container {
+package object container extends spray.routing.Directives {
 
   implicit def wrapK[A](value: Future[A]): RuntimeK[A] = value.liftKleisli
 
@@ -20,5 +26,9 @@ package object container {
     }
   }
 
-  def exec[A](r: RuntimeK[A])(implicit c: Container): Future[A] = r(c)
+  def exec[A](r: RuntimeK[A])(implicit c: Container, m: ToResponseMarshaller[Future[A]]): StandardRoute = {
+    complete {
+      ToResponseMarshallable.isMarshallable(r(c))(m)
+    }
+  }
 }
