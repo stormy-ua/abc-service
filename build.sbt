@@ -14,6 +14,8 @@ libraryDependencies ++= Seq(
 
 libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.2.6"
 
+libraryDependencies += "com.typesafe" % "config" % "1.3.1"
+
 libraryDependencies ++= {
   val akkaV = "2.3.9"
   val sprayV = "1.3.3"

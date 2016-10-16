@@ -10,6 +10,7 @@ import Scalaz._
 
 trait AbcRepository {
   import org.mongodb.scala.model.Filters._
+  import config._
 
   def toAbcDoc(d: Document): AbcDoc =
     AbcDoc(d("id").asInt32().getValue, d("name").asString().getValue)
@@ -18,9 +19,9 @@ trait AbcRepository {
     Document("id" -> d.id, "name" -> d.name)
 
   private val collection = {
-    val mongoClient = MongoClient()
-    val database = mongoClient.getDatabase("local")
-    database.getCollection("test")
+    val mongoClient = MongoClient(mongoInfo.uri)
+    val database = mongoClient.getDatabase(mongoInfo.db)
+    database.getCollection(mongoInfo.collection)
   }
 
   def all = {
